@@ -1,91 +1,103 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import styled from 'styled-components'
-import 'whatwg-fetch'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import styled from "styled-components";
+import "whatwg-fetch";
 
 export default class extends Component {
-  constructor (props) {
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
       gifs: [],
-      searchValue: '',
-      giphySearchUrl: 'http://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC',
-      giphyTrendingUrl: 'http://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzC'
-    }
+      searchValue: "",
+      giphySearchUrl:
+        "https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC",
+      giphyTrendingUrl:
+        "https://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzC"
+    };
 
-    this.loadTrendingGifs()
+    this.loadTrendingGifs();
   }
 
-  static get propTypes () {
+  static get propTypes() {
     return {
       onSelected: PropTypes.func.isRequired,
       visible: PropTypes.bool,
       modal: PropTypes.bool
-    }
+    };
   }
 
-  static get defaultProps () {
+  static get defaultProps() {
     return {
       visible: true,
       modal: false
-    }
+    };
   }
 
-  loadTrendingGifs () {
-    const {giphyTrendingUrl} = this.state
+  loadTrendingGifs() {
+    const { giphyTrendingUrl } = this.state;
     fetch(giphyTrendingUrl, {
-      method: 'get'
-    }).then((response) => {
-      return response.json()
-    }).then((response) => {
-      let gifs = response.data.map((g, i) => {return g.images})
-      this.setState({gifs})
+      method: "get"
     })
+      .then(response => {
+        return response.json();
+      })
+      .then(response => {
+        let gifs = response.data.map((g, i) => {
+          return g.images;
+        });
+        this.setState({ gifs });
+      });
   }
 
-  searchGifs () {
-    const {giphySearchUrl, searchValue} = this.state
-    if (searchValue.length < 1) { return }
-    let url = giphySearchUrl + '&q=' + searchValue.replace(' ', '+')
-    this.setState({gifs: []})
+  searchGifs() {
+    const { giphySearchUrl, searchValue } = this.state;
+    if (searchValue.length < 1) {
+      return;
+    }
+    let url = giphySearchUrl + "&q=" + searchValue.replace(" ", "+");
+    this.setState({ gifs: [] });
     fetch(url, {
-      method: 'get'
-    }).then((response) => {
-      return response.json()
-    }).then((response) => {
-      let gifs = response.data.map((g, i) => {return g.images})
-      this.setState({gifs})
+      method: "get"
     })
+      .then(response => {
+        return response.json();
+      })
+      .then(response => {
+        let gifs = response.data.map((g, i) => {
+          return g.images;
+        });
+        this.setState({ gifs });
+      });
   }
 
-  onGiphySelect (gif) {
-    this.props.onSelected(gif)
+  onGiphySelect(gif) {
+    this.props.onSelected(gif);
   }
 
-  onSearchChange (event) {
-    event.stopPropagation()
-    this.setState({searchValue: event.target.value}, () => this.searchGifs())
+  onSearchChange(event) {
+    event.stopPropagation();
+    this.setState({ searchValue: event.target.value }, () => this.searchGifs());
   }
 
-  onKeyDown (event) {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      this.reset()
+  onKeyDown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      this.reset();
     }
   }
 
-  reset () {
-    this.setState({searchValue: ''})
+  reset() {
+    this.setState({ searchValue: "" });
   }
 
   render() {
-    const {gifs} = this.state
-    const {visible, modal} = this.props
+    const { gifs } = this.state;
+    const { visible, modal } = this.props;
     return (
       <Wrapper>
         <GiphyPickerWrapper visible={visible} modal={modal}>
           <Input
-            name='giphy-search'
+            name="giphy-search"
             type="text"
             autoCapitalize="none"
             autoComplete="off"
@@ -93,46 +105,48 @@ export default class extends Component {
             onChange={this.onSearchChange.bind(this)}
             value={this.state.searchValue}
             onKeyDown={this.onKeyDown.bind(this)}
-            placeholder='Search for gifs' />
+            placeholder="Search for gifs"
+          />
           <GiphyWrapper>
-            {
-              gifs.map((g, i) => {
-                let gifUrl = g.fixed_width.url
-                return (
-                  <Giphy
-                    className='giphy-gif'
-                    key={i}
-                    src={gifUrl}
-                    onClick={() => {this.onGiphySelect(g)}} />
-                )
-              })
-            }
+            {gifs.map((g, i) => {
+              let gifUrl = g.fixed_width.url;
+              return (
+                <Giphy
+                  className="giphy-gif"
+                  key={i}
+                  src={gifUrl}
+                  onClick={() => {
+                    this.onGiphySelect(g);
+                  }}
+                />
+              );
+            })}
           </GiphyWrapper>
         </GiphyPickerWrapper>
       </Wrapper>
-    )
+    );
   }
 }
 
 const Wrapper = styled.div`
   position: relative;
-`
+`;
 
 const GiphyPickerWrapper = styled.div`
-  position: ${props => props.modal ? 'absolute' : 'static'};
-  opacity: ${props => props.visible ? 1 : 0};
+  position: ${props => (props.modal ? "absolute" : "static")};
+  opacity: ${props => (props.visible ? 1 : 0)};
   transition: opacity 300ms linear;
   margin-top: 1rem;
-  border: 1px solid #F1F1F1;
+  border: 1px solid #f1f1f1;
   border-radius: 2px;
   background: white;
-  box-shadow: 3px 3px 5px #BFBDBD;
+  box-shadow: 3px 3px 5px #bfbdbd;
   width: 232px;
   height: 400px;
   overflow-y: scroll;
   z-index: 100;
   padding-top: 1rem;
-`
+`;
 
 const GiphyPicker = styled.div`
   cursor: pointer;
@@ -144,7 +158,7 @@ const GiphyPicker = styled.div`
   &:hover {
     background: rgba(0, 0, 0, 0.1);
   }
-`
+`;
 
 const GiphyWrapper = styled.div`
   display: flex;
@@ -153,14 +167,14 @@ const GiphyWrapper = styled.div`
   padding-right: 0;
   border-radius: 2px;
   align-items: baseline;
-`
+`;
 
 const Giphy = styled.img`
   cursor: pointer;
   justify-content: center;
   align-items: center;
   padding: 0.21rem;
-`
+`;
 
 const Input = styled.input`
   background-color: transparent;
@@ -178,4 +192,4 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
-`
+`;
