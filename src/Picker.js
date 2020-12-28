@@ -85,6 +85,10 @@ export default class extends Component {
       event.preventDefault();
       this.reset();
     }
+    if (event.key === 'Enter') {
+      this.searchGifs();
+      event.preventDefault();
+    }
   }
 
   reset() {
